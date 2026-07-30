@@ -4,5 +4,5 @@ numpy<2.0.0
 yfinance
 scikit-learn
 plotly
-pandas-ta
+pandas-ta-classic==0.6.52
 PyPortfolioOpt
