@@ -9,13 +9,21 @@ from pypfopt import EfficientFrontier, risk_models, expected_returns
 
 # --- Page Configuration ---
 st.set_page_config(
-    page_title="AI Stock Predictor & Portfolio Analyzer",
+    page_title="Indian AI Stock Predictor & Portfolio Analyzer",
     page_icon="📈",
     layout="wide"
 )
 
-st.title("📈 AI Stock Predictor & Portfolio Analyzer")
-st.markdown("Integrates Machine Learning predictions with Portfolio Optimization tailored to your risk profile.")
+st.title("📈 Indian Market AI Predictor & Analyzer")
+st.markdown("Integrates Machine Learning predictions with Portfolio Optimization tailored for Indian investors.")
+
+# --- Auto-Format Indian Tickers ---
+def format_in_ticker(symbol):
+    symbol = symbol.strip().upper()
+    # Automatically append .NS (NSE) if the user forgets it
+    if symbol and not symbol.endswith('.NS') and not symbol.endswith('.BO'):
+        return f"{symbol}.NS"
+    return symbol
 
 # --- Sidebar Inputs ---
 st.sidebar.header("User Settings")
@@ -26,12 +34,15 @@ investor_profile = st.sidebar.selectbox(
     ["Conservative (Low Risk)", "Moderate (Balanced)", "Aggressive (High Risk)"]
 )
 
-# Stock Selection
-ticker = st.sidebar.text_input("Enter Stock Ticker (e.g., AAPL, TSLA, RELIANCE.NS)", "AAPL").upper()
-portfolio_tickers = st.sidebar.text_input(
-    "Enter Basket Tickers for Portfolio Analysis (comma separated)", 
-    "AAPL, MSFT, GOOGL, AMZN"
-).upper().replace(" ", "").split(",")
+# Indian Stock Selection
+raw_ticker = st.sidebar.text_input("Enter NSE Stock Ticker (e.g., IRFC, RELIANCE, ZOMATO)", "IRFC")
+ticker = format_in_ticker(raw_ticker)
+
+raw_portfolio = st.sidebar.text_input(
+    "Enter Basket Tickers for Portfolio (comma separated)", 
+    "RELIANCE, TCS, HDFCBANK, INFY"
+)
+portfolio_tickers = [format_in_ticker(t) for t in raw_portfolio.split(",") if t.strip()]
 
 time_period = st.sidebar.selectbox("Historical Data Horizon", ["2y", "5y", "10y"], index=1)
 
@@ -108,7 +119,7 @@ with tabs[0]:
             fig.add_trace(go.Scatter(x=df['Date'], y=df['Close'], name="Close Price"))
             fig.add_trace(go.Scatter(x=df['Date'], y=df['SMA_20'], name="20-Day SMA"))
             fig.add_trace(go.Scatter(x=df['Date'], y=df['SMA_50'], name="50-Day SMA"))
-            fig.update_layout(title=f"{ticker} Price Chart", xaxis_title="Date", yaxis_title="Price ($)")
+            fig.update_layout(title=f"{ticker} Price Chart", xaxis_title="Date", yaxis_title="Price (₹)")
             st.plotly_chart(fig, use_container_width=True)
             
         with col2:
@@ -125,17 +136,17 @@ with tabs[0]:
             latest_rsi = df['RSI'].iloc[-1]
             st.metric(label="Current RSI (14)", value=f"{latest_rsi:.2f}")
             if latest_rsi > 70:
-                st.warning("Status: Overbought Area")
+                st.warning("Status: Overbought Area (High Risk to Buy)")
             elif latest_rsi < 30:
-                st.info("Status: Oversold Area")
+                st.info("Status: Oversold Area (Potential Buying Opportunity)")
             else:
                 st.write("Status: Neutral Zone")
     else:
-        st.error("Unable to load data for the selected ticker.")
+        st.error(f"Unable to load data for {ticker}. Ensure the stock is listed on NSE/BSE.")
 
 # TAB 2: Portfolio Optimization
 with tabs[1]:
-    st.subheader("Automated Portfolio Optimization")
+    st.subheader("Automated Portfolio Optimization (Indian Equities)")
     st.write(f"**Target Profile:** {investor_profile}")
     
     if len(portfolio_tickers) >= 2:
