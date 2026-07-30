@@ -1,9 +1,8 @@
 streamlit
 pandas
-numpy<2.0.0
+numpy
 yfinance
 scikit-learn
 plotly
-pandas-ta-classic==0.6.52
 cvxpy
 PyPortfolioOpt
