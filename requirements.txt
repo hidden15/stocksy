@@ -6,3 +6,4 @@ scikit-learn
 plotly
 cvxpy
 PyPortfolioOpt
+google-genai
